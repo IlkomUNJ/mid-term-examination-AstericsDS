@@ -153,7 +153,7 @@ impl BstNode {
      * in BST minimum always on the left
      */
     pub fn minimum(&self) -> BstNodeLink {
-        if self.key.is_some() {
+    if self.key.is_some() {
             if let Some(left_node) = &self.left {
                 return left_node.borrow().minimum();
             }
@@ -351,5 +351,81 @@ impl BstNode {
             None => None,
             Some(x) => Some(x.upgrade().unwrap()),
         }
+    }
+
+    pub fn add_node(target_node: &BstNodeLink, value: i32) -> bool {
+        let mut node_ref = target_node.borrow_mut();
+
+        match (&node_ref.left, &node_ref.right) {
+            (None, _) => {
+                node_ref.add_left_child(target_node, value);
+                true
+            }
+            (_, None) => {
+                node_ref.add_right_child(target_node, value);
+                true
+            }
+            _ => {
+                println!("Node already has two children");
+                false
+            }
+        }
+    }
+
+    pub fn median(&self) -> BstNodeLink {
+        let mut current = self.minimum();
+
+        let mut count = 1;
+        let mut temp = current.clone();
+        while let Some(succ) = BstNode::tree_successor(&temp) {
+            count += 1;
+            temp = succ;
+        }
+
+        let steps = count / 2;
+        for _ in 0..steps {
+            current = BstNode::tree_successor(&current)
+                .expect("Expected successor during median walk");
+        }
+
+        current
+    }
+
+    pub fn tree_predecessor(node: &BstNodeLink) -> Option<BstNodeLink> {
+        let node_ref = node.borrow();
+    
+        if let Some(left) = &node_ref.left {
+            let mut current = left.clone();
+            loop {
+                let right_opt = {
+                    let curr_ref = current.borrow();
+                    curr_ref.right.clone()
+                };
+                if let Some(right) = right_opt {
+                    current = right;
+                } else {
+                    break;
+                }
+            }
+            return Some(current);
+        }    
+        
+        let mut current = node.clone();
+        let mut parent = BstNode::upgrade_weak_to_strong(node_ref.parent.clone());
+    
+        drop(node_ref);
+    
+        while let Some(parent_rc) = parent {
+            let parent_ref = parent_rc.borrow();
+            if let Some(right_child) = &parent_ref.right {
+                if Rc::ptr_eq(right_child, &current) {
+                    return Some(parent_rc.clone());
+                }
+            }
+            current = parent_rc.clone();
+            parent = BstNode::upgrade_weak_to_strong(parent_ref.parent.clone());
+        }
+    
+        None
     }
 }
