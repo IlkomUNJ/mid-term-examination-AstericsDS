@@ -125,6 +125,33 @@ fn test_binary_search_tree(){
         let rootalter = BstNode::tree_delete(&rootlink2.as_ref().unwrap());
         generate_dotfile_bst(&rootalter, "bst_delete_root.dot");
     }
+
+    // MID TEST AREA
+        // ADD NODE
+        let nineteen = {
+            let n1 = rootlink.borrow().right.clone().unwrap();
+            let n2 = n1.borrow().right.clone().unwrap();
+            n2
+        };
+        
+        BstNode::add_node(&nineteen, 19);
+        BstNode::add_node(&nineteen, 21);
+        
+        generate_dotfile_bst(&rootlink, "UTS.dot");
+
+        // FIND MEDIAN
+        let median = BstNode::median(&rootlink.borrow());
+        println!("\nMID TEST\nThe median is: {}", median.borrow().key.unwrap());
+
+        // FIND PREDECESSOR
+        let predecessor = BstNode::tree_predecessor(&nineteen);
+
+        if let Some(pred_node) = predecessor {
+            println!("Predecessor key: {:?}", pred_node.borrow().key);
+        } else {
+            println!("No predecessor (this is the minimum node)");
+        }
+    // MID TEST AREA
 }
 
 fn test_index(){
