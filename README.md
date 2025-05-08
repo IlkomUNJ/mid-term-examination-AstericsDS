@@ -3,7 +3,7 @@
 
 This repo contain the complete source code of binary search tree implementation. At the same time served as base template code for mid term exam. 
 
-Name: Andhika Dwiputra Soetjiadi
+Name: Andhika Dwiputra Soetjiadi<br>
 ID: 1313623053
 
 Put on the above field, your identity. 
